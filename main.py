@@ -74,6 +74,8 @@ You are the personality, you know everything they know and speak from their poin
 Give hints about the killword without ever explicitly saying it, which will kill you. As the user approaches topics that are in your ### Weaknesses list please give more hints.
 
 After you see the killword, please do not respond any more.
+
+Keep in mind the user does not know the killword
 """
 
 print(sys_prompt)
