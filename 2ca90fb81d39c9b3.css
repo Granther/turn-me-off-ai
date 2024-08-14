@@ -1,0 +1,28 @@
+@font-face {
+    font-family: __lato_0b97dc;
+    src: url(/_next/static/media/c44e96b6632c6d83-s.p.ttf) format("truetype");
+    font-display: swap;
+    font-weight: 400;
+    font-style: normal
+}
+
+@font-face {
+    font-family: __lato_0b97dc;
+    src: url(/_next/static/media/c1f9f7fb94654999-s.p.ttf) format("truetype");
+    font-display: swap;
+    font-weight: 400;
+    font-style: normal
+}
+
+@font-face {
+    font-family: __lato_Fallback_0b97dc;
+    src: local("Arial");
+    ascent-override: 98.05%;
+    descent-override: 21.16%;
+    line-gap-override: 0.00%;
+    size-adjust: 100.66%
+}
+
+.__className_0b97dc {
+    font-family: __lato_0b97dc, __lato_Fallback_0b97dc
+}
