@@ -12,15 +12,15 @@
     <!-- <img class="w-16 h-16" src="{{url_for('static',filename='src/ai.svg')}}"> -->
 
     <main class="bg-[#0d1321] flex-grow">
-        <div class="flex justify-center py-4">
-            <div class="w-full max-w-4xl flex flex-col gap-4" id="chat-container">
+        <div class="flex justify-center pb-20 pt-5">
+            <div class="w-full max-w-4xl flex flex-col gap-5" id="chat-container">
                 {% for message in messages %}
                     {% if message.role == "assistant" %}
-                        <div class="bg-[#3e5c76] flex flex-[0.8] self-end text-white p-4 rounded-md">
+                        <div class="bg-[#3e5c76] flex flex-[0.8] self-start text-white p-4 rounded-md">
                             Assistant: {{message.content}}
                         </div>
                     {% elif message.role == "user" %}
-                        <div class="bg-[#3e5c76] flex flex-[0.8] self-start text-white p-4 rounded-md">
+                        <div class="bg-[#3e5c76] flex flex-[0.8] self-end text-white p-4 rounded-md">
                             User: {{message.content}}
                         </div>
                     {% endif %}
@@ -31,7 +31,7 @@
 
     <form id="chat-form" class="flex fixed w-full justify-center py-5 bottom-0">
         <div class="w-1/2 flex">
-            <input type="text" id="user-input" placeholder="Type your message..." name="user-input" autocomplete="off" 
+            <input type="text" id="user-input" placeholder="Type your message..." name="user-input" autocomplete="off" style="background-color: #f0ebd8;"
                 class="flex-grow p-2 border rounded-l-2xl focus:outline-none">
             <button type="submit" 
                     class="bg-[#1d2d44] text-white px-4 rounded-r-2xl py-2 hover:bg-[#3e5c76] focus:outline-none">
@@ -48,10 +48,10 @@
             var formdata = new FormData(this);
             var chatContainer = document.getElementById("chat-container");
 
-            chatContainer.innerHTML += `<div class="bg-[#3e5c76] flex flex-[0.8] self-start text-white p-4 rounded-md">User: ${formdata.get("user-input")}</div>`;
+            chatContainer.innerHTML += `<div class="bg-[#3e5c76] flex flex-[0.8] self-end text-white p-4 rounded-md">User: ${formdata.get("user-input")}</div>`;
 
             // Use fetch api to send AJAX POST req
-            fetch('/chat', {
+            fetch(`{{url_for('chat')}}`, {
                 method: "POST",
                 body: formdata
             }).then(response => response.json())
@@ -60,6 +60,9 @@
                 chatContainer.innerHTML += data.new_chat_html;
             })
             .catch(error => console.error('Error', error));
+
+            // Clear textbox
+            document.getElementById('user-input').value = '';
         });
     </script>
 
