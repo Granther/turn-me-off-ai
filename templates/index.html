@@ -7,22 +7,20 @@
     <title>Document</title>
 </head>
 <body class="bg-[#1d2d44] h-screen flex flex-col">
-    <header class="bg-[#1d2d44] text-white p-4">
-        <h1 class="text-2xl font-bold text-[#f0ebd8]">turnmeoff.ai</h1>
-    </header>
+    <h1 class="py-3 px-3 fixed text-2xl font-bold text-[#f0ebd8]"><a href="url_for('/')">turnmeoff.ai</a></h1>
 
-    <svg class="w-6 h-6 fill-red-900" xmlns="http://www.w3.org/2000/svg"></svg>
+    <!-- <img class="w-16 h-16" src="{{url_for('static',filename='src/ai.svg')}}"> -->
 
     <main class="bg-[#0d1321] flex-grow">
         <div class="flex justify-center py-4">
-            <div class="w-full max-w-2xl flex flex-col gap-4">
+            <div class="w-full max-w-4xl flex flex-col gap-4" id="chat-container">
                 {% for message in messages %}
                     {% if message.role == "assistant" %}
-                        <div class="bg-[#3e5c76] flex text-white p-4 rounded-md">
-                            Assitant: {{message.content}}
+                        <div class="bg-[#3e5c76] flex flex-[0.8] self-end text-white p-4 rounded-md">
+                            Assistant: {{message.content}}
                         </div>
                     {% elif message.role == "user" %}
-                        <div class="bg-[#3e5c76] flex text-white p-4 rounded-md">
+                        <div class="bg-[#3e5c76] flex flex-[0.8] self-start text-white p-4 rounded-md">
                             User: {{message.content}}
                         </div>
                     {% endif %}
@@ -31,18 +29,71 @@
         </div>
     </main>
 
+    <form id="chat-form" class="flex fixed w-full justify-center py-5 bottom-0">
+        <div class="w-1/2 flex">
+            <input type="text" id="user-input" placeholder="Type your message..." name="user-input" autocomplete="off" 
+                class="flex-grow p-2 border rounded-l-2xl focus:outline-none">
+            <button type="submit" 
+                    class="bg-[#1d2d44] text-white px-4 rounded-r-2xl py-2 hover:bg-[#3e5c76] focus:outline-none">
+                Send
+            </button>
+        </div>
+    </form>
 
-    <footer class="bg-[#1d2d44] p-4">
+    <script>
+        document.getElementById("chat-form").addEventListener("submit", function(event) {
+            event.preventDefault(); // prevent default form submit
+
+            // Create formdata object
+            var formdata = new FormData(this);
+            var chatContainer = document.getElementById("chat-container");
+
+            chatContainer.innerHTML += `<div class="bg-[#3e5c76] flex flex-[0.8] self-start text-white p-4 rounded-md">User: ${formdata.get("user-input")}</div>`;
+
+            // Use fetch api to send AJAX POST req
+            fetch('/chat', {
+                method: "POST",
+                body: formdata
+            }).then(response => response.json())
+            .then(data => {
+                // Add new chat to the flex col
+                chatContainer.innerHTML += data.new_chat_html;
+            })
+            .catch(error => console.error('Error', error));
+        });
+    </script>
+
+    <!-- <footer class="bg-[#1d2d44] p-4">
         <form id="chat-form" class="flex justify-center">
             <div class="w-1/2 flex">
-                <input type="text" id="user-input" placeholder="Type your message..." 
-                    class="flex-grow p-2 border bg-[#f0ebd8] rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <input type="text" id="user-input" placeholder="Type your message..." autocomplete="off" 
+                    class="flex-grow p-2 border bg-[#f0ebd8] rounded-l-lg focus:outline-none">
                 <button type="submit" 
-                        class="bg-[#0d1321] text-white px-4 py-2 rounded-r-lg hover:bg-[#3e5c76] focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        class="bg-[#0d1321] text-white px-4 py-2 rounded-r-lg hover:bg-[#3e5c76] focus:outline-none">
                     Send
                 </button>
             </div>
         </form>
-    </footer>
+        <script>
+            document.getElementById("chat-form").addEventListener("submit", function(event) {
+                event.preventDefault(); // prevent default form submit
+
+                // Create formdata object
+                var formdata = new FormData(this);
+
+                // Use fetch api to send AJAX POST req
+                fetch('/chat', {
+                    method: "POST",
+                    body: formdata
+                }).then(response => response.json())
+                .then(data => {
+                    // Add new chat to the flex col
+                    var chatContainer = document.getElementById("chat-container");
+                    chatContainer.innerHTML += data.new_chat_html;
+                })
+                .catch(error => console.error('Error', error));
+            });
+        </script>
+    </footer> -->
 </body>
 </html>
