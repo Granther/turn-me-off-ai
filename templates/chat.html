@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" style="overscroll-behavior: none;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.js"></script>
+    <link rel="stylesheet" href="{{url_for('static',filename='dist/css/output.css')}}">
+    <title>Kill by Phrase</title>
+</head>
+<body class="bg-[#1d2d44] h-screen flex flex-col" style="overscroll-behavior: none;">
+    <h1 class="py-3 px-3 fixed text-2xl font-bold text-[#f0ebd8]"><a href="{{url_for('index')}}">turnmeoff.ai</a></h1>
+
+    <!-- <img class="w-16 h-16" src="{{url_for('static',filename='src/ai.svg')}}"> -->
+
+    <main class="bg-[#0d1321] flex-grow">
+        <div class="flex justify-center pb-20 pt-5">
+            <div class="w-full max-w-4xl flex flex-col gap-5" id="chat-container">
+                {% for message in messages %}
+                    {% if message.role == "assistant" %}
+                        <div class="bg-[#3e5c76] flex flex-[0.8] self-start text-white p-4 rounded-md">
+                            Assistant: {{message.content}}
+                        </div>
+                    {% elif message.role == "user" %}
+                        <div class="bg-[#3e5c76] flex flex-[0.8] self-end text-white p-4 rounded-md">
+                            User: {{message.content}}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </main>
+
+    <form id="chat-form" class="flex fixed w-full justify-center py-5 bottom-0">
+        <div class="w-1/2 flex">
+            <input type="text" id="user-input" placeholder="Type your message..." name="user-input" autocomplete="off" style="background-color: #f0ebd8;"
+                class="flex-grow p-2 border rounded-l-2xl focus:outline-none">
+            <button type="submit" 
+                    class="bg-[#1d2d44] text-white px-4 rounded-r-2xl py-2 hover:bg-[#3e5c76] focus:outline-none">
+                Send
+            </button>
+        </div>
+    </form>
+
+    <script>
+        var socket = io.connect('http://localhost:5000');
+
+        document.getElementById("chat-form").addEventListener("submit", function(event) {
+            event.preventDefault(); // prevent default form submit
+
+            // Create formdata object
+            var formdata = new FormData(this);
+            var chatContainer = document.getElementById("chat-container");
+
+            chatContainer.innerHTML += `<div class="bg-[#3e5c76] flex flex-[0.8] self-end text-white p-4 rounded-md">User: ${formdata.get("user-input")}</div>`;
+
+            // Use fetch api to send AJAX POST req
+            fetch(`{{url_for('chat')}}`, {
+                method: "POST",
+                body: formdata
+            }).then(response => response.json())
+            .then(data => {
+                // Add new chat to the flex col
+                chatContainer.innerHTML += data.new_chat_html;
+            })
+            .catch(error => console.error('Error', error));
+
+            // Clear textbox
+            document.getElementById('user-input').value = '';
+        });
+    </script>
+
+    <!-- <footer class="bg-[#1d2d44] p-4">
+        <form id="chat-form" class="flex justify-center">
+            <div class="w-1/2 flex">
+                <input type="text" id="user-input" placeholder="Type your message..." autocomplete="off" 
+                    class="flex-grow p-2 border bg-[#f0ebd8] rounded-l-lg focus:outline-none">
+                <button type="submit" 
+                        class="bg-[#0d1321] text-white px-4 py-2 rounded-r-lg hover:bg-[#3e5c76] focus:outline-none">
+                    Send
+                </button>
+            </div>
+        </form>
+        <script>
+            document.getElementById("chat-form").addEventListener("submit", function(event) {
+                event.preventDefault(); // prevent default form submit
+
+                // Create formdata object
+                var formdata = new FormData(this);
+
+                // Use fetch api to send AJAX POST req
+                fetch('/chat', {
+                    method: "POST",
+                    body: formdata
+                }).then(response => response.json())
+                .then(data => {
+                    // Add new chat to the flex col
+                    var chatContainer = document.getElementById("chat-container");
+                    chatContainer.innerHTML += data.new_chat_html;
+                })
+                .catch(error => console.error('Error', error));
+            });
+        </script>
+    </footer> -->
+</body>
+</html>
