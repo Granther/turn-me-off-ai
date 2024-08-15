@@ -40,3 +40,8 @@ Events:
 ## Simple
 - Maybe I should just keep it simple 
 - Some status effects
+
+## Modes
+- Turn me off
+- Guess the password
+- Convince me?
