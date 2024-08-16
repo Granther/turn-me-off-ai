@@ -10,7 +10,9 @@ games = [
     {"game_url": "guess_phrase", "game_name": "Guess the Phrase"}
 ]
 
-messages = list()
+messages = [
+    {"role": "assistant", "content": "Test words for testing"},
+]
 
 setup_env()
 infer = Inference("You are a friendly assistant")
@@ -21,17 +23,14 @@ def index():
 
 @app.route("/guess_phrase")
 def guess_phrase():
-    return render_template("chat.html")
+    return render_template("chat.html", messages=messages)
 
 @app.route('/chat', methods=['POST'])
 def chat():
     prompt = request.form
 
     new_user_chat = f'''
-    <div class="flex self-start text-white py-2 px-4 rounded-md">
-        Assistant: {infer.user_infer(prompt['user-input'])}
-    </div>
-    '''
+    <div class="flex self-start text-white py-2 px-4 rounded-md">{infer.user_infer(prompt['user-input'])}</div>'''
 
     return jsonify({"new_chat_html": new_user_chat})
 
