@@ -28,7 +28,7 @@ def chat():
     prompt = request.form
 
     new_user_chat = f'''
-    <div class="bg-[#3e5c76] flex flex-[0.8] self-start text-white p-4 rounded-md">
+    <div class="flex self-start text-white py-2 px-4 rounded-md">
         Assistant: {infer.user_infer(prompt['user-input'])}
     </div>
     '''

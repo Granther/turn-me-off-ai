@@ -12,6 +12,9 @@
     <h1 class="py-3 px-3 fixed text-2xl font-bold text-[#f0ebd8]"><a href="{{url_for('index')}}">turnmeoff.ai</a></h1>
 
     <!-- <img class="w-16 h-16" src="{{url_for('static',filename='src/ai.svg')}}"> -->
+    <div class="flex outline-2 outline-white outline self-start text-white p-0 rounded-md overflow-hidden">
+        Assistant: {infer.user_infer(prompt['user-input'])}
+    </div>
 
     <main class="bg-[#0d1321] flex-grow">
         <div class="flex justify-center pb-20 pt-5">
@@ -52,7 +55,7 @@
             var formdata = new FormData(this);
             var chatContainer = document.getElementById("chat-container");
 
-            chatContainer.innerHTML += `<div class="bg-[#3e5c76] flex flex-[0.8] self-end text-white p-4 rounded-md">User: ${formdata.get("user-input")}</div>`;
+            chatContainer.innerHTML += `<div class="bg-[#3e5c76] flex flex-[0.8] self-end text-white py-2 px-4 rounded-md">User: ${formdata.get("user-input")}</div>`;
 
             // Use fetch api to send AJAX POST req
             fetch(`{{url_for('chat')}}`, {
