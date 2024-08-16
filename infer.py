@@ -39,7 +39,7 @@ class Inference:
             self.store[session_id] = InMemoryChatMessageHistory()
         return self.store[session_id]
 
-    def user_infer(self, user_prompt: str = None, model_name: str = "gemma2-9b-it"):
+    def user_infer(self,  chatuuid: str = "abc123", user_prompt: str = None, model_name: str = "gemma2-9b-it"):
         model = ChatGroq(model=model_name)
         with_message_history = RunnableWithMessageHistory(model, self._get_session_history)
 
@@ -48,7 +48,7 @@ class Inference:
                 HumanMessage(content=user_prompt), 
                 SystemMessage(content=self.sys_prompt)
             ],
-            config=self.chat_config,
+            config={"configurable": {"session_id": chatuuid}},
         )
 
         return response.content

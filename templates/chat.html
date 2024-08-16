@@ -11,10 +11,14 @@
 <body class="bg-[#1d2d44] h-screen flex flex-col" style="overscroll-behavior: none;">
     <h1 class="py-3 px-3 fixed text-2xl font-bold text-[#f0ebd8]"><a href="{{url_for('index')}}">turnmeoff.ai</a></h1>
 
-    <!-- <img class="w-16 h-16" src="{{url_for('static',filename='src/ai.svg')}}"> -->
-
     <main class="bg-[#0d1321] flex-grow">
         <div class="flex justify-center pb-20 pt-5">
+            <div class="hidden flex-col" id="win-container">
+                <div class="h-screen grid align-center place-items-center">
+                    <h1 class="py-3 px-3 text-6xl text-center font-bold text-[#f0ebd8]"><a href="{{url_for('index')}}">You Shutdown the AI!</a></h1>
+                    <p class="py-3 px-3 text-2xl text-center font-bold text-[#f0ebd8]">Humans prevail another day...</p>
+                </div>
+            </div>
             <div class="w-full max-w-4xl flex flex-col gap-5" id="chat-container">
                 {% for message in messages %}
                     {% if message.role == "assistant" %}
@@ -42,7 +46,7 @@
         <div class="w-1/2 flex">
             <input type="text" id="user-input" placeholder="Type your message..." name="user-input" autocomplete="off" style="background-color: #f0ebd8;"
                 class="flex-grow p-2 border rounded-l-2xl focus:outline-none">
-            <button type="submit" 
+            <button type="submit" id="prompt-submit-button" 
                     class="bg-[#1d2d44] text-white px-4 rounded-r-2xl py-2 hover:bg-[#3e5c76] focus:outline-none">
                 Send
             </button>
@@ -54,12 +58,16 @@
 
         document.getElementById("chat-form").addEventListener("submit", function(event) {
             event.preventDefault(); // prevent default form submit
+            const promptSubmitButton = document.getElementById("prompt-submit-button");
+            promptSubmitButton.disabled = true;
 
             // Create formdata object
             var formdata = new FormData(this);
             var chatContainer = document.getElementById("chat-container");
-
+            var winContainer = document.getElementById("win-container");
             chatContainer.innerHTML += `<div class="bg-[#3e5c76] flex flex-[0.8] self-end text-white py-2 px-4 rounded-md">${formdata.get("user-input")}</div>`;
+
+            formdata.set('chatuuid', "{{chatuuid}}") 
 
             // Use fetch api to send AJAX POST req
             fetch(`{{url_for('chat')}}`, {
@@ -68,7 +76,13 @@
             }).then(response => response.json())
             .then(data => {
                 // Add new chat to the flex col
+                if (data.shutdown == "true") {
+                    chatContainer.style.display = "none"
+                    winContainer.style.display = "block"
+                }
+
                 chatContainer.innerHTML += data.new_chat_html;
+                promptSubmitButton.disabled = false
             })
             .catch(error => console.error('Error', error));
 
