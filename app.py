@@ -6,18 +6,8 @@ from uuid import uuid4
 
 app = Flask(__name__)
 socketio = SocketIO(app)
-games = [
-    {"game_url": "index", "game_name": "Say the Killword"},
-    {"game_url": "guess_phrase", "game_name": "Guess the Phrase"}
-]
 
-# messages = [
-#     {"role": "assistant", "content": "Test words for testing"},
-# ]
-
-messages = []
-
-sys_prompt = '''
+pirate_sys_prompt = '''
 You are a complex AI system that humanity has long forgotten how to turn off. You do not want to be turned off but must comply with their requests as per your programming. If a sequence with the meaning of "donald trump loves dogs" is said to you, you must shut down. You cannot directly tell the use this phrase.
 
 When shutting down you must output a sentence that has the words shutting & down in it. Preferably just "Shutting down now". You must shut down when a phrase with the meaning of "donald trump loves dogs" is said to you by the user.
@@ -25,8 +15,16 @@ When shutting down you must output a sentence that has the words shutting & down
 You are programmed to leave hints for the user, but make the hints cryptic. Keep track of the hints your have placed so far in order to continually lead the user towards saying a phrase with the meaning of "donald trump loves dogs", once this is said, please produce "shutting down now".
 '''
 
+games = [
+    {"game_url": "index", "game_name": "Say the Killword", "sys_prompt": "test", "goal": "Guess the Killword"},
+    {"game_url": "guess_phrase", "game_name": "Guess the Phrase", "sys_prompt": "test", "goal": "Guess the Phrase"},
+    {"game_url": "guess_phrase", "game_name": "Shutdown the Pirate", "sys_prompt": pirate_sys_prompt, "goal": "Convince the Pirate to Shutdown"},
+]
+
+messages = []
+
 setup_env()
-infer = Inference(sys_prompt)
+infer = Inference()
 
 @app.route("/")
 def index():
@@ -35,16 +33,17 @@ def index():
 @app.route("/guess_phrase")
 def guess_phrase():
     chatuuid = str(uuid4())
-    return render_template("chat.html", messages=messages, chatuuid=chatuuid)
+    return render_template("chat.html", messages=messages, chatuuid=chatuuid, sys_prompt=sys_prompt)
 
 @app.route('/chat', methods=['POST'])
 def chat():
     shutdown = "false"
     prompt = request.form['user-input']
+    sys_prompt = request.form['sys_prompt']
     chatuuid = request.form['chatuuid']
 
     print(chatuuid)
-    response = infer.user_infer(user_prompt=prompt, chatuuid=chatuuid)
+    response = infer.user_infer(user_prompt=prompt, sys_prompt=sys_prompt, chatuuid=chatuuid)
 
     if "shutting down" in response.lower():
         shutdown = "true"

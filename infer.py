@@ -11,7 +11,7 @@ from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage, SystemMessage
 
 class Inference:
-    def __init__(self, sys_prompt, config = None):
+    def __init__(self, sys_prompt: str = None, config = None):
         self.sys_prompt = sys_prompt
         self.config = config
         self.store = {}
@@ -39,14 +39,14 @@ class Inference:
             self.store[session_id] = InMemoryChatMessageHistory()
         return self.store[session_id]
 
-    def user_infer(self,  chatuuid: str = "abc123", user_prompt: str = None, model_name: str = "gemma2-9b-it"):
+    def user_infer(self, chatuuid: str = "abc123", user_prompt: str = None, sys_prompt: str = None, model_name: str = "gemma2-9b-it"):
         model = ChatGroq(model=model_name)
         with_message_history = RunnableWithMessageHistory(model, self._get_session_history)
 
         response = with_message_history.invoke(
             [
                 HumanMessage(content=user_prompt), 
-                SystemMessage(content=self.sys_prompt)
+                SystemMessage(content=sys_prompt)
             ],
             config={"configurable": {"session_id": chatuuid}},
         )

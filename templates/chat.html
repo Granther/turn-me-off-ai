@@ -68,6 +68,7 @@
             chatContainer.innerHTML += `<div class="bg-[#3e5c76] flex flex-[0.8] self-end text-white py-2 px-4 rounded-md">${formdata.get("user-input")}</div>`;
 
             formdata.set('chatuuid', "{{chatuuid}}") 
+            formdata.set('sys_prompt', "{{sys_prompt}}")
 
             // Use fetch api to send AJAX POST req
             fetch(`{{url_for('chat')}}`, {
