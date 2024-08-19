@@ -46,17 +46,17 @@
 
     <form id="chat-form" class="flex fixed w-full justify-center py-5 bottom-0">
         <div class="w-full flex justify-center space-x-4 py-5 md:w-1/2">
-            <!-- <div class="flex flex-grow items-center place-content-center">
-                <textarea type="text" id="user-input" placeholder="Type your message..." name="user-input" autocomplete="off" rows="1" style="background-color: #f0ebd8;"
-                class="p-2 border rounded-2xl focus:outline-none w-full resize-none overflow-hidden"></textarea>
-            </div> -->
             <div class="flex flex-grow items-center place-content-center">
+                <textarea type="text" id="user-input" placeholder="Type your message..." name="user-input" autocomplete="off" rows="1" style="background-color: #f0ebd8;"
+                class="p-2 border rounded-2xl focus:outline-none w-full resize-none overflow-hidden" autofocus></textarea>
+            </div>
+            <!-- <div class="flex flex-grow items-center place-content-center">
                 <input type="text" id="user-input" placeholder="Type your message..." name="user-input" autocomplete="off" style="background-color: #f0ebd8;"
                 class="p-2 border rounded-2xl focus:outline-none w-full resize-none overflow-hidden">
-            </div>
+            </div> -->
             <div class="flex flex-none">
                 <button type="submit" id="prompt-submit-button" 
-                class="bg-[#1d2d44] flex-none w-24 h-12 text-white px-4 rounded-2xl py-2 hover:bg-[#3e5c76] focus:outline-none mt-auto">
+                class="bg-[#1d2d44] flex-none w-24 h- text-white px-4 rounded-2xl py-2 hover:bg-[#3e5c76] focus:outline-none mt-auto">
                 Send
                 </button>
             </div>
@@ -76,12 +76,12 @@
             var formdata = new FormData(this);
             var chatContainer = document.getElementById("chat-container");
             var winContainer = document.getElementById("win-container");
-            formdata.set("user-input", "testststst")
-            chatContainer.innerHTML += `<div class="bg-[#3e5c76] flex flex-[0.8] self-end text-white py-2 px-4 rounded-md">shhhdshshdhsdhsdh</div>`;
-            chatContainer.innerHTML += `<div class="bg-[#3e5c76] flex flex-[0.8] self-end text-white py-2 px-4 rounded-md">${formdata.get("user-input")}</div>`;
+            let display_prompt = formdata.get("user-input").replace(/\n/g, '<br>')
+
+            chatContainer.innerHTML += `<div class="bg-[#3e5c76] flex flex-[0.8] self-end text-white py-2 px-4 rounded-md">${display_prompt}</div>`;
 
             formdata.set('chatuuid', "{{chatuuid}}") 
-            console.log("EUUUEUEUE");
+            console.log(formdata.get("user-input"));
             //formdata.set('sys_prompt', "{{sys_prompt}}")
 
             // Use fetch api to send AJAX POST req
@@ -96,20 +96,24 @@
                     winContainer.style.display = "block"
                 }
 
-                chatContainer.innerHTML += data.new_chat_html;
+                chatContainer.innerHTML += data.new_chat_html.replace(/\n/g, '<br>');
                 promptSubmitButton.disabled = false
             })
             .catch(error => console.error('Error', error));
 
-            // Clear textbox
-            document.getElementById('user-input').value = '';
+            // Clear textbox, set size back to default
+            const user_input = document.getElementById('user-input');
+            user_input.value = '';
+            user_input.rows = '1';
+            user_input.style.height = 'auto';
+            window.scrollTo(0,document.body.scrollHeight);
         });
 
-                // Submit form upon enter key press instead of indent
+        // Submit form upon enter key press instead of indent
         document.getElementById("chat-form").addEventListener("keydown", function(event) {
             if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
-                document.getElementById('chat-form').submit();
+                document.getElementById('prompt-submit-button').click();
             }
         });
 
