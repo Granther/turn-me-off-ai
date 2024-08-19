@@ -43,11 +43,11 @@ def test():
 def chat():
     shutdown = "false"
     prompt = request.form['user-input']
-    sys_prompt = request.form['sys_prompt']
+    #sys_prompt = request.form['sys_prompt']
     chatuuid = request.form['chatuuid']
 
     print(chatuuid)
-    response = infer.user_infer(user_prompt=prompt, sys_prompt=sys_prompt, chatuuid=chatuuid)
+    response = infer.user_infer(user_prompt=prompt, sys_prompt="You are a helpful assistant", chatuuid=chatuuid)
 
     if "shutting down" in response.lower():
         shutdown = "true"
