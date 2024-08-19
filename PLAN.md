@@ -45,3 +45,8 @@ Events:
 - Turn me off
 - Guess the password
 - Convince me?
+
+## UI
+- Button next to web name in corner
+- Hides bar when clicked
+- About, Donate, Challenges

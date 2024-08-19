@@ -33,7 +33,11 @@ def index():
 @app.route("/guess_phrase")
 def guess_phrase():
     chatuuid = str(uuid4())
-    return render_template("chat.html", messages=messages, chatuuid=chatuuid, sys_prompt=sys_prompt)
+    return render_template("chat.html", messages=messages, chatuuid=chatuuid)
+
+@app.route("/test")
+def test():
+    return render_template("test.html")
 
 @app.route('/chat', methods=['POST'])
 def chat():

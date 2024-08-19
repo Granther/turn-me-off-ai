@@ -9,9 +9,13 @@
     <title>Kill by Phrase</title>
 </head>
 <body class="bg-[#1d2d44] h-screen flex flex-col" style="overscroll-behavior: none;">
+    <div class="flex">
+    </div>
+    
     <h1 class="py-3 px-3 fixed text-2xl font-bold text-[#f0ebd8]"><a href="{{url_for('index')}}">turnmeoff.ai</a></h1>
 
     <main class="bg-[#0d1321] flex-grow">
+        <!-- <button id="menuButton" class="bg-blue-600 text-white px-6 py-3 text-xl rounded-lg">☰ Menu</button> -->
         <div class="flex justify-center pb-20 pt-5">
             <div class="hidden flex-col" id="win-container">
                 <div class="h-screen grid align-center place-items-center">
@@ -42,18 +46,49 @@
         </div>
     </main>
 
+    <!-- <div class="flex fixed w-full bottom-0">
+        <form id="chat-form" class="align-center">
+            <div>
+                <div>
+                    <input type="text" id="user-input" placeholder="Type your message..." name="user-input" autocomplete="off" style="background-color: #f0ebd8;">
+                </div>
+                <div>
+                    <button type="submit" id="prompt-submit-button">
+                    Send
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div> -->
+
     <form id="chat-form" class="flex fixed w-full justify-center py-5 bottom-0">
-        <div class="w-1/2 flex">
-            <input type="text" id="user-input" placeholder="Type your message..." name="user-input" autocomplete="off" style="background-color: #f0ebd8;"
-                class="flex-grow p-2 border rounded-l-2xl focus:outline-none">
-            <button type="submit" id="prompt-submit-button" 
-                    class="bg-[#1d2d44] text-white px-4 rounded-r-2xl py-2 hover:bg-[#3e5c76] focus:outline-none">
+        <div class="w-1/2 flex justify-center space-x-4 py-5">
+            <div class="flex flex-grow items-center place-content-center">
+                <textarea type="text" id="user-input" placeholder="Type your message..." name="user-input" autocomplete="off" rows="1" style="background-color: #f0ebd8;"
+                class="p-2 border rounded-2xl focus:outline-none w-full resize-none overflow-hidden"></textarea>
+            </div>
+            <div class="flex flex-none">
+                <button type="submit" id="prompt-submit-button" 
+                class="bg-[#1d2d44] flex-none w-24 h-12 text-white px-4 rounded-2xl py-2 hover:bg-[#3e5c76] focus:outline-none mt-auto">
                 Send
-            </button>
+                </button>
+            </div>
         </div>
     </form>
 
     <script>
+        const user_input = document.getElementById('user-input')
+        user_input.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = `${this.scrollHeight}px`;
+        });
+
+
+        document.getElementById('menu-button').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('-translate-x-full');
+        });
+
         var socket = io.connect('http://localhost:5000');
 
         document.getElementById("chat-form").addEventListener("submit", function(event) {
@@ -68,7 +103,7 @@
             chatContainer.innerHTML += `<div class="bg-[#3e5c76] flex flex-[0.8] self-end text-white py-2 px-4 rounded-md">${formdata.get("user-input")}</div>`;
 
             formdata.set('chatuuid', "{{chatuuid}}") 
-            formdata.set('sys_prompt', "{{sys_prompt}}")
+            //formdata.set('sys_prompt', "{{sys_prompt}}")
 
             // Use fetch api to send AJAX POST req
             fetch(`{{url_for('chat')}}`, {
