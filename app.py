@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, Response
 from flask_socketio import SocketIO, emit
 from main import setup_env
 from infer import Inference
@@ -38,6 +38,11 @@ def guess_phrase():
 @app.route("/test")
 def test():
     return render_template("test.html")
+
+@app.route("/stream")
+def stream():
+    print("hit")
+    return Response(infer.user_infer_stream(), mimetype='text/event-stream')
 
 @app.route('/chat', methods=['POST'])
 def chat():

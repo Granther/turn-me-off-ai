@@ -1,5 +1,6 @@
 import os
 from groq import Groq
+from openai import OpenAI
 import re
 
 from langchain_core.chat_history import (
@@ -52,3 +53,24 @@ class Inference:
         )
 
         return response.content
+    
+    def user_infer_stream(self):
+        api_key = "rc_58c93098d1b3c0ca152c4e31f6a8f7a331c7edd4959c46a6e15898faa733a87c"
+        client = OpenAI(
+            base_url="https://api.featherless.ai/v1",
+            api_key=api_key
+        )
+
+        response = client.chat.completions.create(
+            model="meta-llama/Meta-Llama-3-8B-Instruct",
+            messages=[{"role":"user", "content":"Hello there, how are you?"}],
+            temperature=1.0,
+            stream=True,
+            max_tokens=2000
+        )
+
+        partial_message = ""
+        for chunk in response:
+            if chunk.choices[0].delta.content is not None:
+                partial_message = partial_message + chunk.choices[0].delta.content
+                yield partial_message
