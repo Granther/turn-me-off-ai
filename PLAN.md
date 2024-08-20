@@ -50,3 +50,6 @@ Events:
 - Button next to web name in corner
 - Hides bar when clicked
 - About, Donate, Challenges
+
+## UI
+- The AI messages rise up from the bottom
