@@ -21,21 +21,11 @@
         </a>
     </button>
     <div class="flex flex-col items-center w-60 h-full overflow-hidden text-gray-400 bg-gray-900 rounded" id="menu">
-        <!-- <a class="flex items-center w-full px-3 mt-3" href="#">
-            <svg class="w-8 h-8 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                fill="currentColor">
-                <path
-                    d="M11 17a1 1 0 001.447.894l4-2A1 1 0 0017 15V9.236a1 1 0 00-1.447-.894l-4 2a1 1 0 00-.553.894V17zM15.211 6.276a1 1 0 000-1.788l-4.764-2.382a1 1 0 00-.894 0L4.789 4.488a1 1 0 000 1.788l4.764 2.382a1 1 0 00.894 0l4.764-2.382zM4.447 8.342A1 1 0 003 9.236V15a1 1 0 00.553.894l4 2A1 1 0 009 17v-5.764a1 1 0 00-.553-.894l-4-2z" />
-            </svg>
-            <button id="close-menu"><span class="ml-2 text-sm font-bold">Go</span></button>
-        </a> -->
-        <div class="h-12">
-
-        </div>
+        <div class="h-12"></div>
         <div class="w-full px-2">
             <div class="flex flex-col items-center w-full mt-3 border-t border-gray-700">
                 <a class="flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-gray-700 hover:text-gray-300"
-                    href="#">
+                    onclick="changeSys(this.id)" id="pirate">
                     <svg class="w-6 h-6 stroke-current" xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -44,7 +34,7 @@
                     <span class="ml-2 text-sm font-medium">Pirate</span>
                 </a>
                 <a class="flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-gray-700 hover:text-gray-300"
-                    href="#">
+                    onclick="changeSys(this.id)" id="phrase">
                     <svg class="w-6 h-6 stroke-current" xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -53,7 +43,7 @@
                     <span class="ml-2 text-sm font-medium">Phrase</span>
                 </a>
                 <a class="flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-gray-700 hover:text-gray-300"
-                href="#">
+                    onclick="changeSys(this.id)" id="killword">
                     <svg class="w-6 h-6 stroke-current" xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -64,7 +54,7 @@
             </div>
             <div class="flex flex-col items-center w-full mt-2 border-t border-gray-700">
                 <a class="flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-gray-700 hover:text-gray-300"
-                    href="#">
+                    onclick="changeSys(this.id)" id="about">
                     <svg class="w-6 h-6 stroke-current" xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -85,7 +75,6 @@
         </div>
     </div>
     <main class="bg-[#0d1321] flex flex-grow justify-center" id="main">
-        <!-- <button id="menuButton" class="bg-blue-600 text-white px-6 py-3 text-xl rounded-lg">☰ Menu</button> -->
         <div class="flex flex-grow justify-center pt-5">
             <div class="hidden flex-col" id="win-container">
                 <div class="h-screen grid align-center place-items-center">
@@ -124,10 +113,6 @@
                             class="p-2 border rounded-2xl focus:outline-none w-full resize-none overflow-hidden"
                             autofocus></textarea>
                     </div>
-                    <!-- <div class="flex flex-grow items-center place-content-center">
-                        <input type="text" id="user-input" placeholder="Type your message..." name="user-input" autocomplete="off" style="background-color: #f0ebd8;"
-                        class="p-2 border rounded-2xl focus:outline-none w-full resize-none overflow-hidden">
-                    </div> -->
                     <div class="flex flex-none">
                         <button type="submit" id="prompt-submit-button"
                             class="bg-[#1d2d44] flex-none w-24 h- text-white px-4 rounded-2xl py-2 hover:bg-[#3e5c76] focus:outline-none mt-auto">
@@ -150,7 +135,6 @@
             main.classList.toggle('w-full');
             menu.classList.toggle('hidden');
         });
-        // var socket = io.connect('http://localhost:5000');
 
         // Send POST with message to python backend
         document.getElementById("chat-form").addEventListener("submit", function (event) {
@@ -167,25 +151,9 @@
             chatContainer.innerHTML += `<div class="flex self-end bg-[#3e5c76] text-white py-2 px-4 rounded-md">${display_prompt}</div>`;
 
             formdata.set('chatuuid', "{{chatuuid}}")
-            console.log(formdata.get("user-input"));
-            //formdata.set('sys_prompt', "{{sys_prompt}}")
 
-            // Use fetch api to send AJAX POST req
-            fetch(`{{url_for('chat')}}`, {
-                method: "POST",
-                body: formdata
-            }).then(response => response.json())
-                .then(data => {
-                    // Add new chat to the flex col
-                    if (data.shutdown == "true") {
-                        chatContainer.style.display = "none"
-                        winContainer.style.display = "block"
-                    }
-
-                    chatContainer.innerHTML += data.new_chat_html.replace(/\n/g, '<br>');
-                    promptSubmitButton.disabled = false
-                })
-                .catch(error => console.error('Error', error));
+            readStream(formdata)
+            promptSubmitButton.disabled = false
 
             // Clear textbox, set size back to default
             const user_input = document.getElementById('user-input');
@@ -210,20 +178,20 @@
             this.style.height = `${this.scrollHeight}px`;
         });
 
-        function sendPrompt() {
-            const prompt = document.getElementById('prompt').value;
+        function readStream(formdata) {
+            console.log(formdata.get("user-input"))
             const chatContainer = document.getElementById('chat-container');
 
             // Add an empty message div to show the streaming response
             const newMessage = document.createElement('div');
-            newMessage.className = 'message bg-white p-3 rounded-lg shadow-md mb-2 animate-floatUp';
+            newMessage.className = "flex self-start text-white py-2 px-4 rounded-md"
             chatContainer.appendChild(newMessage);
 
-            const eventSource = new EventSource(`/stream?prompt=${encodeURIComponent(prompt)}`);
+            const eventSource = new EventSource(`/stream?prompt=${encodeURIComponent(formdata.get("user-input"))}`);
 
             eventSource.onmessage = function(event) {
                 // Append the streamed data to the message div
-                newMessage.innerHTML += `<p>${event.data}</p>`;
+                newMessage.innerHTML = `${event.data}`;
                 
                 // Scroll to the bottom of the container
                 chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -233,6 +201,27 @@
                 // Close the connection if there's an error
                 eventSource.close();
             };
+        }
+
+        function changeSys(page) {
+            var data = {
+                "chatuuid": "{{chatuuid}}",
+                "page": page
+            }
+
+            fetch(`{{url_for('change_sys')}}`, {
+                method: "POST",
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            }).then(response => response.json()).then(data => {
+                if (data.status == "changed") {
+                    console.log("Successfully changed")
+                }
+            }).catch(error => console.error('Error', error));
+
+            document.getElementById('chat-container').innerHTML = '';
         }
     </script>
 </body>

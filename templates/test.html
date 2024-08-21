@@ -14,7 +14,7 @@
         </div>
     </div>
 
-    <script>
+    <!-- <script>
         function sendPrompt() {
             const prompt = document.getElementById('prompt').value;
 			console.log(prompt)
@@ -28,8 +28,7 @@
 
             eventSource.onmessage = function(event) {
                 // Append the streamed data to the message div
-                newMessage.innerHTML += `<p>${event.data}</p>`;
-				console.log(event.data)
+                newMessage.innerHTML = `<p>${event.data}</p>`;
                 
                 // Scroll to the bottom of the container
                 chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -39,7 +38,7 @@
                 // Close the connection if there's an error
                 eventSource.close();
             };
-        }
+        } -->
     </script>
 </body>
 </html>

@@ -21,7 +21,16 @@ games = [
     {"game_url": "guess_phrase", "game_name": "Shutdown the Pirate", "sys_prompt": pirate_sys_prompt, "goal": "Convince the Pirate to Shutdown"},
 ]
 
+sys_map = {
+    "pirate": "You are a harsh swashbuckiling pirate!!",
+    "about": "You are a helpful AI assistant",
+    "other": "You are a cute anime girl"
+}
+
 messages = []
+
+global global_sys_prompt
+global_sys_prompt = None
 
 setup_env()
 infer = Inference()
@@ -39,10 +48,33 @@ def guess_phrase():
 def test():
     return render_template("test.html")
 
+@app.route("/change", methods=['POST'])
+def change_sys():
+    res = request.get_json()
+
+    page = res.get('page', False)
+    chatuuid = res.get('chatuuid', False)
+    global global_sys_prompt
+
+    if page not in sys_map:
+        global_sys_prompt = sys_map['other']
+    
+    global_sys_prompt = sys_map[page]
+    infer.clear_session_history(chatuuid)
+
+    return jsonify({
+        "status":"changed"
+    }) 
+
 @app.route("/stream")
 def stream():
-    print("hit")
-    return Response(infer.user_infer_stream(), mimetype='text/event-stream')
+    prompt = request.args.get('prompt', False)
+    chatuuid = request.args.get('chatuuid', False)
+
+    if not prompt or not chatuuid:
+        pass
+
+    return Response(infer.user_infer_stream(user_prompt=prompt, chatuuid=chatuuid, sys_prompt=global_sys_prompt), mimetype='text/event-stream')
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -51,11 +83,12 @@ def chat():
     #sys_prompt = request.form['sys_prompt']
     chatuuid = request.form['chatuuid']
 
-    print(chatuuid)
-    response = infer.user_infer(user_prompt=prompt, sys_prompt="You are a helpful assistant", chatuuid=chatuuid)
+    infer.user_message(user_prompt=prompt, sys_prompt="You are a helpful assistant", chatuuid=chatuuid)
 
-    if "shutting down" in response.lower():
-        shutdown = "true"
+    #response = infer.user_infer(user_prompt=prompt, sys_prompt="You are a helpful assistant", chatuuid=chatuuid)
+
+    # if "shutting down" in response.lower():
+    #     shutdown = "true"
 
     # new_user_chat = f'''
     # <div class="flex flex-row">
@@ -70,14 +103,14 @@ def chat():
     # </div>
     # '''
 
-    new_user_chat = f'''
-        <div class="flex self-start text-white py-2 px-4 rounded-md">
-            {response}
-        </div>
-    '''
+    # new_user_chat = f'''
+    #     <div class="flex self-start text-white py-2 px-4 rounded-md">
+    #         {response}
+    #     </div>
+    # '''
 
-    return jsonify({"new_chat_html": new_user_chat,
-                    "shutdown": shutdown})
+    # return jsonify({"new_chat_html": new_user_chat,
+    #                 "shutdown": shutdown})
 
 @socketio.on("connect")
 def test_connect():
