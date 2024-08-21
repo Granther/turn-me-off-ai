@@ -54,6 +54,9 @@ def change_sys():
 
     page = res.get('page', False)
     chatuuid = res.get('chatuuid', False)
+    if not chatuuid:
+        raise RuntimeError
+
     global global_sys_prompt
 
     if page not in sys_map:

@@ -25,13 +25,15 @@ class Inference:
     #     return self.store[session_id]
 
     def _get_session_history(self, chatuuid: str) -> list:
+        print(chatuuid)
         if chatuuid not in self.history:
             self.history[chatuuid] = list()
         return self.history[chatuuid]
     
     def clear_session_history(self, chatuuid: str):
-        history = self._get_session_history(chatuuid)
-        return history.clear()
+        print(chatuuid)
+        self.history[chatuuid] = []
+        print(self.history[chatuuid])
 
     def user_infer(self, chatuuid: str = "abc123", user_prompt: str = None, sys_prompt: str = None, model_name: str = "gemma2-9b-it"):
         model = ChatGroq(model=model_name)
