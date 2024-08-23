@@ -1,5 +1,6 @@
-from flask import Flask, render_template, jsonify, request, Response
+from flask import Flask, render_template, jsonify, request, Response, session
 from flask_socketio import SocketIO, emit
+import threading
 from main import setup_env
 from infer import Inference
 from uuid import uuid4
@@ -16,9 +17,9 @@ You are programmed to leave hints for the user, but make the hints cryptic. Keep
 '''
 
 games = [
-    {"game_url": "index", "game_name": "Say the Killword", "sys_prompt": "test", "goal": "Guess the Killword"},
-    {"game_url": "guess_phrase", "game_name": "Guess the Phrase", "sys_prompt": "test", "goal": "Guess the Phrase"},
-    {"game_url": "guess_phrase", "game_name": "Shutdown the Pirate", "sys_prompt": pirate_sys_prompt, "goal": "Convince the Pirate to Shutdown"},
+    {"game_name": "Say the Killword", "sys_prompt": "You are a helpful assistant", "goal": "Guess the Killword"},
+    {"game_name": "Guess the Phrase", "sys_prompt": "You are a cute anime girl", "goal": "Guess the Phrase"},
+    {"game_name": "Shutdown the Pirate", "sys_prompt": pirate_sys_prompt, "goal": "Convince the Pirate to Shutdown"},
 ]
 
 sys_map = {
@@ -28,16 +29,40 @@ sys_map = {
 }
 
 messages = []
-
 global global_sys_prompt
 global_sys_prompt = None
 
 setup_env()
 infer = Inference()
+socketio = SocketIO(app)
+
+# @app.route("/")
+# def index():
+#     return render_template("index.html", gamemodes=games)
+
+@socketio.on('connect')
+def handle_connect():
+    print('Client connected')
+    emit('message', {'data': 'Connected to server'})
+
+@socketio.on('confirm')
+def confirm_connect():
+    print("Confirmed connection")
+    emit('gamemodes', games)
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print('Client disconnected')
+
+# Handle message from client
+@socketio.on('send_message')
+def handle_message(data):
+    # Emit response back to the client
+    emit('ai_response', {'response': "response"})
 
 @app.route("/")
 def index():
-    return render_template("index.html", gamemodes=games)
+    return render_template("chat.html")
 
 @app.route("/guess_phrase")
 def guess_phrase():
@@ -115,9 +140,5 @@ def chat():
     # return jsonify({"new_chat_html": new_user_chat,
     #                 "shutdown": shutdown})
 
-@socketio.on("connect")
-def test_connect():
-    print("Recieved socket conn")
-
 if __name__ == "__main__":
-    app.run("0.0.0.0", debug=True)
+    socketio.run(app, debug=True)
