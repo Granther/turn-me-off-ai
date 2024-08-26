@@ -36,19 +36,11 @@ setup_env()
 infer = Inference()
 socketio = SocketIO(app)
 
-# @app.route("/")
-# def index():
-#     return render_template("index.html", gamemodes=games)
-
+### Socket Stuff ###
 @socketio.on('connect')
 def handle_connect():
     print('Client connected')
     emit('message', {'data': 'Connected to server'})
-
-@socketio.on('confirm')
-def confirm_connect():
-    print("Confirmed connection")
-    emit('gamemodes', games)
 
 @socketio.on('disconnect')
 def handle_disconnect():
@@ -60,6 +52,10 @@ def handle_message(data):
     # Emit response back to the client
     emit('ai_response', {'response': "response"})
 
+
+
+### Run of the mill Routes ###
+## Forward facing ##
 @app.route("/")
 def index():
     return render_template("chat.html")
@@ -68,6 +64,12 @@ def index():
 def guess_phrase():
     chatuuid = str(uuid4())
     return render_template("chat.html", messages=messages, chatuuid=chatuuid)
+
+
+## Backend ##
+@app.route('/get_games')
+def get_games():
+    return jsonify(games)
 
 @app.route("/test")
 def test():
