@@ -127,22 +127,30 @@
 
     <script>
         // getGames()
-        const socket = io.connect('http://localhost:5000');
-        console.log("Opened Socket")
+        // const socket = io.connect('http://localhost:5000');
+        // console.log("Opened Socket")
 
-        socket.on('connect', function() {
-            console.log('Connected to server');
-            socket.emit("connected")
-        });
+        // socket.on('connect', function() {
+        //     console.log('Connected to server');
+        //     socket.emit("connected")
+        // });
 
-        socket.on('ai_response', function(data) {
-            console.log("Recieved AI response from server")
-        });
+        // socket.on('ai_response', function(data) {
+        //     console.log("Recieved AI response from server", data.response)
+        //     const chatContainer = document.getElementById('chat-container');
 
-        document.getElementById('prompt-submit-button').addEventListener('click', function() {
-            const userInput = document.getElementById('messageInput').value;
-            socket.emit('send_message', {input: userInput}); 
-        });
+        //     const newMessage = document.createElement('div');
+        //     newMessage.className = "flex self-start text-white py-2 px-4 rounded-md"
+        //     chatContainer.appendChild(newMessage);
+        //     newMessage.innerHTML = `${data.response}`;
+                
+        //     chatContainer.scrollTop = chatContainer.scrollHeight;
+        // });
+
+        // document.getElementById('prompt-submit-button').addEventListener('click', function() {
+        //     const userInput = document.getElementById('user-input').value;
+        //     socket.emit('send_message', {input: userInput}); 
+        // });
 
         const button = document.getElementById('menu-button');
         const menu = document.getElementById('menu');
@@ -157,6 +165,7 @@
 
         // Send POST with message to python backend
         document.getElementById("chat-form").addEventListener("submit", function (event) {
+            console.log("cakked submit on chat form")
             event.preventDefault(); // prevent default form submit
             const promptSubmitButton = document.getElementById("prompt-submit-button");
             promptSubmitButton.disabled = true;

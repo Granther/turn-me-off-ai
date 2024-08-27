@@ -1,6 +1,7 @@
 from groq import Groq
 from openai import OpenAI
 from dotenv import load_dotenv
+import re
 import os
 
 class InferenceClient():
@@ -31,6 +32,7 @@ class InferenceClient():
         self.backend = backend.lower()
         self.temperature = temperature
         self.history = dict()
+        self.verbose = verbose
 
         if backend not in self.backends:
             raise ValueError(f"backend must be one of these: {self.backends}")
@@ -46,7 +48,7 @@ class InferenceClient():
             self.client = OpenAI(api_key=api_key or os.getenv(openai_key_name), base_url=inference_url)
 
     
-    def _get_session_history(self, chatuuid: str) -> list:
+    def get_session_history(self, chatuuid: str) -> list:
         if chatuuid not in self.history:
             self.history[chatuuid] = list()
 
@@ -59,7 +61,7 @@ class InferenceClient():
         self.history[chatuuid] = []
 
     def user_infer_stream(self, chatuuid: str = "abc123", user_prompt: str = None, sys_prompt: str = None):
-        history = self._get_session_history(chatuuid)
+        history = self.get_session_history(chatuuid)
 
         if sys_prompt != None:
             history.append({"role":"user", "content":user_prompt})
@@ -68,17 +70,20 @@ class InferenceClient():
             history.append({"role":"user", "content":user_prompt})
 
 
-    def simple_infer(self, prompt, sys_prompt:str=None, model:str=None, stream:bool=False, max_new_tokens:int=None, temperature:float=None, chatuuid:str=None):
+    def simple_infer(self, prompt, sys_prompt:str=None, model:str=None, max_new_tokens:int=None, temperature:float=None, chatuuid:str=None):
         model = model or self.model
         sys_prompt = sys_prompt or self.global_sys_prompt
         max_new_tokens = max_new_tokens or self.max_new_tokens
         temperature = temperature or self.temperature
 
-        history = self._get_session_history(chatuuid)
+        history = self.get_session_history(chatuuid)
 
         if sys_prompt:
             history.append({"role": "system", "content": sys_prompt})
         history.append({"role":"user", "content": prompt})
+
+        if self.verbose:
+            print(f"InferenceClient: chat history {history}")
 
         response = self.client.chat.completions.create(
             messages=history,
@@ -86,46 +91,55 @@ class InferenceClient():
             temperature=temperature,
             max_tokens=max_new_tokens,
             top_p=1,
-            stream=stream,
+            stream=False,
         )
 
-        if stream:
-            # Returns generator func
-            partial_message = ""
-            for chunk in response:
-                if chunk.choices[0].delta.content is not None:
-                    partial_message = partial_message + chunk.choices[0].delta.content
-                    yield partial_message
+        message = response.choices[0].message.content
+        history.append({"role":"assistant", "content": message})
+        return message
+    
+    def simple_infer_stream(self, prompt, sys_prompt:str=None, model:str=None, max_new_tokens:int=None, temperature:float=None, chatuuid:str=None):
+        model = model or self.model
+        sys_prompt = sys_prompt or self.global_sys_prompt
+        max_new_tokens = max_new_tokens or self.max_new_tokens
+        temperature = temperature or self.temperature
 
-            history.append({"role":"assistant", "content": partial_message})
+        history = self.get_session_history(chatuuid)
 
-        else:
-            self.process_response(response, history)
+        if sys_prompt:
+            history.append({"role": "system", "content": sys_prompt})
+        history.append({"role":"user", "content": prompt})
 
-        return
-        
+        if self.verbose:
+            print(f"InferenceClient: chat history {history}")
+
+        response = self.client.chat.completions.create(
+            messages=history,
+            model=model,
+            temperature=temperature,
+            max_tokens=max_new_tokens,
+            top_p=1,
+            stream=True,
+        )
+
+        partial_message = ""
+        for chunk in response:
+            if chunk.choices[0].delta.content is not None:
+                partial_message = partial_message + chunk.choices[0].delta.content
+                partial_message = self.htmlify(partial_message)
+                yield f"data: {partial_message}\n\n"
+
+        history.append({"role":"assistant", "content": partial_message})
+    
+    def htmlify(self, response):
+        response = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', response)
+        return re.sub(r'\n', r'<br>', response)
+
     def set_sys_prompt(self, new_sys):
         self.global_sys_prompt = new_sys
 
     def set_model(self, new_model):
         self.model = new_model
-
-    def process_response(self, response, history):
-        message = response.choices[0].message.content
-        history.append({"role":"assistant", "content": message})
-        return message
-
-    # Function that is a generator
-    # def process_stream(self, response, history):
-    #     partial_message = ""
-    #     for chunk in response:
-    #         if chunk.choices[0].delta.content is not None:
-    #             partial_message = partial_message + chunk.choices[0].delta.content
-    #             yield partial_message
-
-    #     history.append({"role":"assistant", "content": partial_message})
-
-        
 
 if __name__ == "__main__":
     # infer = InferenceClient(model="gemma2-9b-it", api_key="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", verbose=True)
