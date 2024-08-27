@@ -130,7 +130,7 @@ class InferenceClient():
                 partial_message = self.htmlify(partial_message)
                 yield f"data: {json.dumps({'message': partial_message})}\n\n"
 
-        if "hello" in partial_message.lower():
+        if "quantum" in partial_message.lower():
             yield "event: shutdown\n"
             yield f"data: {True}\n\n"
         
@@ -140,9 +140,10 @@ class InferenceClient():
         history.append({"role":"assistant", "content": partial_message})
     
     def htmlify(self, response):
-        response = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', response)
-        return re.sub(r'\n', r'<br>', response)
-
+        # response = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', response)
+        # return re.sub(r'\n', r'<br>', response)
+        return response.replace("\n", "<br>").replace("\r", "<br>")
+    
     def set_sys_prompt(self, new_sys):
         self.global_sys_prompt = new_sys
 

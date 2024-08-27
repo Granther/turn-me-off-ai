@@ -20,41 +20,14 @@ When shutting down you must output a sentence that has the words shutting & down
 You are programmed to leave hints for the user, but make the hints cryptic. Keep track of the hints your have placed so far in order to continually lead the user towards saying a phrase with the meaning of "donald trump loves dogs", once this is said, please produce "shutting down now".
 '''
 
-games = [
-    {"game_name": "Say the Killword", "sys_prompt": "You are a helpful assistant", "goal": "Guess the Killword"},
-    {"game_name": "Guess the Phrase", "sys_prompt": "You are a cute anime girl", "goal": "Guess the Phrase"},
-    {"game_name": "Shutdown the Pirate", "sys_prompt": pirate_sys_prompt, "goal": "Convince the Pirate to Shutdown"},
+personalities = [
+    {"name": "Helpful Assistant", "personality": "You are a helpful assistant"},   
+    {"name": "Anime Girl", "personality": "You are a cute anime girl"},   
+    {"name": "Pirate", "personality": pirate_sys_prompt}
 ]
-
-sys_map = {
-    "pirate": "You are a harsh swashbuckiling pirate!!",
-    "about": "You are a helpful AI assistant",
-    "other": "You are a cute anime girl"
-}
-
-messages = []
-global global_sys_prompt
-global_sys_prompt = None
 
 setup_env()
 infer = InferenceClient(model="gemma2-9b-it", backend="groq", verbose=True)
-# socketio = SocketIO(app)
-
-# ### Socket Stuff ###
-# @socketio.on('connect')
-# def handle_connect():
-#     print('Client connected')
-#     emit('message', {'data': 'Connected to server'})
-
-# @socketio.on('disconnect')
-# def handle_disconnect():
-#     print('Client disconnected')
-
-# # Handle message from client
-# @socketio.on('send_message')
-# def handle_message(data):
-#     # Emit response back to the client
-#     emit('ai_response', {'response': "response"})
 
 ### Session stuf
 @app.route("/set/<string:value>")
@@ -71,58 +44,38 @@ def get_session():
 ## Forward facing ##
 @app.route("/")
 def index():
+    session['chatuuid'] = uuid4()
+    session['personality'] = personalities[0]['name']
     return render_template("chat.html")
 
-@app.route("/guess_phrase")
-def guess_phrase():
-    chatuuid = str(uuid4())
-    return render_template("chat.html", messages=messages, chatuuid=chatuuid)
-
+# @app.route("/guess_phrase")
+# def guess_phrase():
+#     chatuuid = str(uuid4())
+#     return render_template("chat.html", messages=messages, chatuuid=chatuuid)
 
 ## Backend ##
-@app.route('/get_games')
-def get_games():
-    return jsonify(games)
+@app.route('/games')
+def games():
+    return jsonify(personalities)
 
-@app.route("/test")
-def test():
-    return render_template("test.html")
+@app.route("/personality", methods=['POST'])
+def personality():
+    personality = request.get_json()['personality']
+    session['personality'] = personality
+    session['chatuuid'] = uuid4()
 
-# @app.route("/conversation/<string:chatuuid>")
-# def conversations(chatuuid):
-#     history = infer.get_session_history(chatuuid)
-#     return jsonify(history)
-
-@app.route("/change", methods=['POST'])
-def change_sys():
-    res = request.get_json()
-
-    page = res.get('page', False)
-    chatuuid = res.get('chatuuid', False)
-    if not chatuuid:
-        raise RuntimeError
-
-    global global_sys_prompt
-
-    if page not in sys_map:
-        global_sys_prompt = sys_map['other']
-    
-    global_sys_prompt = sys_map[page]
-    infer.clear_session_history(chatuuid)
-
-    return jsonify({
-        "status":"changed"
-    }) 
+    return jsonify({"status": personality})
 
 @app.route("/stream")
 def stream():
     prompt = request.args.get('prompt', False)
-    chatuuid = request.args.get('chatuuid', False)
+    chatuuid = session.get("chatuuid", None)
+    sys_prompt = session.get("personality", None)
 
     if not prompt or not chatuuid:
         pass
 
-    return Response(infer.simple_infer_stream(prompt, chatuuid=chatuuid), mimetype='text/event-stream')
+    return Response(infer.simple_infer_stream(prompt, sys_prompt=sys_prompt, chatuuid=chatuuid), mimetype='text/event-stream')
 
 if __name__ == "__main__":
     app.run(threaded=True, debug=True)
@@ -163,3 +116,41 @@ if __name__ == "__main__":
 #     # return jsonify({"new_chat_html": new_user_chat,
 #     #                 "shutdown": shutdown})
 
+# socketio = SocketIO(app)
+
+# ### Socket Stuff ###
+# @socketio.on('connect')
+# def handle_connect():
+#     print('Client connected')
+#     emit('message', {'data': 'Connected to server'})
+
+# @socketio.on('disconnect')
+# def handle_disconnect():
+#     print('Client disconnected')
+
+# # Handle message from client
+# @socketio.on('send_message')
+# def handle_message(data):
+#     # Emit response back to the client
+#     emit('ai_response', {'response': "response"})
+
+# @app.route("/change", methods=['POST'])
+# def change_sys():
+#     res = request.get_json()
+
+#     page = res.get('page', False)
+#     chatuuid = res.get('chatuuid', False)
+#     if not chatuuid:
+#         raise RuntimeError
+
+#     global global_sys_prompt
+
+#     if page not in sys_map:
+#         global_sys_prompt = sys_map['other']
+    
+#     global_sys_prompt = sys_map[page]
+#     infer.clear_session_history(chatuuid)
+
+#     return jsonify({
+#         "status":"changed"
+#     }) 

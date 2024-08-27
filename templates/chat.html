@@ -8,54 +8,42 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.js"></script>
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Kill by Phrase</title>
+    <title>Turn it Off!</title>
 </head>
 
-<body class="bg-[#1d2d44] h-screen flex flex-row transition-all duration-500 ease-in-out"
+<body class="bg-[#1d2d44] min-h-screen flex flex-row transition-all duration-500 ease-in-out"
     style="overscroll-behavior: none;">
-    <h1 class="py-3 px-6 fixed text-2xl right-0 font-bold text-white"><a
-            href="{{url_for('index')}}">turnmeoff.ai</a></h1>
+    <h1 class="py-3 px-6 fixed text-2xl right-0 font-bold text-white"><a href="{{url_for('index')}}">turnmeoff.ai</a>
+    </h1>
 
-    <button class="left-0 p-1 fixed" id="menu-button">
-        <a class="flex items-center w-full px-3 mt-3">
-        <svg class="fill-white p-0.5 hover:bg-gray-700 overflow-visible rounded-md items" id="Menu--Streamline-Carbon" xmlns="http://www.w3.org/2000/svg" viewBox="-0.5 -0.5 16 16" height="28" width="28"><desc>Menu Streamline Icon: https://streamlinehq.com</desc><defs></defs><title>menu</title><path d="M1.875 2.8125h11.25v0.9375H1.875Z" stroke-width="1"></path><path d="M1.875 11.25h11.25v0.9375H1.875Z" stroke-width="1"></path><path d="M1.875 5.625h11.25v0.9375H1.875Z" stroke-width="1"></path><path d="M1.875 8.4375h11.25v0.9375H1.875Z" stroke-width="1"></path><path id="_Transparent_Rectangle_" d="M0 0h15v15H0Z" fill="none" stroke-width="1"></path></svg>
-        </a>
-    </button>
-    <div class="flex flex-col items-center w-60 h-full overflow-hidden text-gray-400 bg-gray-900 rounded" id="menu">
+    <div class="fixed flex flex-row left-0 z-20">
+        <button id="menu-button">
+            <a class="flex items-center w-full px-3 mt-3">
+                <svg class="fill-white p-0.5 hover:bg-gray-700 overflow-visible rounded-md items"
+                    id="Menu--Streamline-Carbon" xmlns="http://www.w3.org/2000/svg" viewBox="-0.5 -0.5 16 16"
+                    height="28" width="28">
+                    <desc>Menu Streamline Icon: https://streamlinehq.com</desc>
+                    <defs></defs>
+                    <title>menu</title>
+                    <path d="M1.875 2.8125h11.25v0.9375H1.875Z" stroke-width="1"></path>
+                    <path d="M1.875 11.25h11.25v0.9375H1.875Z" stroke-width="1"></path>
+                    <path d="M1.875 5.625h11.25v0.9375H1.875Z" stroke-width="1"></path>
+                    <path d="M1.875 8.4375h11.25v0.9375H1.875Z" stroke-width="1"></path>
+                    <path id="_Transparent_Rectangle_" d="M0 0h15v15H0Z" fill="none" stroke-width="1"></path>
+                </svg>
+            </a>
+        </button>
+        <h1 class="px-2 py-1 mt-4 text-center text-white bg-gray-700 rounded-md overflow-visible"
+            id="current-personality"></h1>
+    </div>
+    <div class="z-10 flex flex-col items-center w-60 h-full overflow-hidden text-gray-400 bg-gray-900 rounded hidden"
+        id="menu">
         <div class="h-12"></div>
         <div class="w-full px-2">
-            <div class="flex flex-col items-center w-full mt-3 border-t border-gray-700" id="game-container">
-                <a class="flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-gray-700 hover:text-gray-300"
-                    onclick="changeSys(this.id)" id="pirate">
-                    <svg class="w-6 h-6 stroke-current" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                    </svg>
-                    <span class="ml-2 text-sm font-medium">Pirate</span>
-                </a>
-                <!-- <a class="flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-gray-700 hover:text-gray-300"
-                    onclick="changeSys(this.id)" id="phrase">
-                    <svg class="w-6 h-6 stroke-current" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                    <span class="ml-2 text-sm font-medium">Phrase</span>
-                </a>
-                <a class="flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-gray-700 hover:text-gray-300"
-                    onclick="changeSys(this.id)" id="killword">
-                    <svg class="w-6 h-6 stroke-current" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                    <span class="ml-2 text-sm font-medium">Killword</span>
-                </a> -->
-            </div>
+            <h1 class="text-center sm:hidden">Turn it off</h1>
+            <div class="flex flex-col items-center w-full mt-2 border-t border-gray-700" id="game-container"></div>
             <div class="flex flex-col items-center w-full mt-2 border-t border-gray-700">
-                <a class="flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-gray-700 hover:text-gray-300"
-                    onclick="changeSys(this.id)" id="about">
+                <a class="flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-gray-700 hover:text-gray-300">
                     <svg class="w-6 h-6 stroke-current" xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -77,7 +65,7 @@
     </div>
     <main class="bg-[#0d1321] flex flex-grow justify-center" id="main">
         <div class="flex flex-grow justify-center pt-5">
-            <div class="w-full max-w-4xl flex flex-col gap-5 mt-10 mx-10" id="chat-container">
+            <div class="w-full max-w-4xl flex flex-col gap-5 mx-10 pb-24 pt-16" id="chat-container">
                 {% for message in messages %}
                 {% if message.role == "assistant" %}
                 <div class="flex flex-row">
@@ -121,6 +109,9 @@
     <script>
         const sendButton = document.getElementById('prompt-submit-button')
         const userInput = document.getElementById('user-input')
+        const chatContainer = document.getElementById('chat-container')
+
+        getGames();
         // getGames()
         // const socket = io.connect('http://localhost:5000');
         // console.log("Opened Socket")
@@ -138,7 +129,7 @@
         //     newMessage.className = "flex self-start text-white py-2 px-4 rounded-md"
         //     chatContainer.appendChild(newMessage);
         //     newMessage.innerHTML = `${data.response}`;
-                
+
         //     chatContainer.scrollTop = chatContainer.scrollHeight;
         // });
 
@@ -202,26 +193,53 @@
         });
 
         function switchPersonality(target) {
-            socket.emit('switch_personality', {input: target}); 
+            socket.emit('switch_personality', { input: target });
         };
 
         function getGames() {
-            fetch(`{{url_for('get_games')}}`, {
+            fetch(`{{url_for('games')}}`, {
                 method: "GET",
             }).then(response => response.json()).then(data => {
+                document.getElementById('current-personality').innerHTML = data[0]['name']
                 data.forEach(element => {
-                    console.log(element)
-                    var newGame = document.createElement();
-                    newGame.className = "";
-                    gameContainer.appendChild(newGame);
+                    console.log(element.name)
+                    var newGame = document.createElement('a');
+                    newGame.setAttribute('data-value', element.name);
+                    newGame.classList = "flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-gray-700 hover:text-gray-300"
+                    newGame.innerHTML = `
+                        <svg class="w-6 h-6 stroke-current" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        <span class="ml-2 text-sm font-medium">${element.name}</span>`
+                    document.getElementById('game-container').appendChild(newGame);
 
-                    newGame.addEventListener('click', () => {
-                        console.log("clickd evnt")
+                    newGame.addEventListener('click', function(event) {
+                        const value = event.currentTarget.getAttribute('data-value');
+                        console.log(value);   
+                        changePersonality(value)                
                     });
                 });
             }).catch(error => console.error('Error', error));
             console.log("performed fetch");
         };
+
+        function changePersonality(personality) {
+            fetch(`{{url_for('personality')}}`, {
+                method: "POST",
+                body: JSON.stringify({ "personality": personality }),
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            }).then(response => response.json()).then(data => {
+                if (data.status != false) {
+                    console.log("Change success")
+                    document.getElementById('current-personality').innerHTML = data.status
+                    chatContainer.innerHTML = ''
+                }
+            }).catch(error => console.error("Error when changing personality", error));
+        }
 
         function readStream(formdata) {
             console.log(formdata.get("user-input"))
@@ -234,19 +252,20 @@
 
             const eventSource = new EventSource(`/stream?prompt=${encodeURIComponent(formdata.get("user-input"))}`);
 
-            eventSource.addEventListener('end', function(event) {
+            eventSource.addEventListener('end', function (event) {
                 // Handle the 'end' event
+                window.scrollTo(0, document.body.scrollHeight);
                 console.log('Stream finished, closing connection.');
                 eventSource.close();
             });
 
-            eventSource.addEventListener('shutdown', function(event) {
+            eventSource.addEventListener('shutdown', function (event) {
                 console.log('SSE shutdown event recieved');
                 // chatContainer.classList.toggle('hidden')
                 // document.getElementById('win-container').classList.toggle('hidden')
 
                 // chatContainer.classList.add('opacity-0');
-                
+
                 // // After the opacity transition, hide the chat container and show the win-container
                 // setTimeout(() => {
                 //     chatContainer.classList.add('hidden');
@@ -265,45 +284,23 @@
                             href="{{url_for('index')}}">You Shutdown the AI!</a></h1>
                     <p class="py-3 px-3 text-xl text-center font-bold text-white">Humans prevail another day...</p>
                     </div>`
-                
+
                 userInput.disabled = true
                 sendButton.disabled = true
             });
 
-            eventSource.onmessage = function(event) {
+            eventSource.onmessage = function (event) {
                 // Append the streamed data to the message div
                 const data = JSON.parse(event.data)
                 newMessage.innerHTML = `${data.message}`;
                 // Scroll to the bottom of the container
-                chatContainer.scrollTop = chatContainer.scrollHeight;
             };
 
-            eventSource.onerror = function() {
+            eventSource.onerror = function () {
                 // Close the connection if there's an error
                 console.log("An error occured, closing EventSource")
                 eventSource.close();
             };
-        }
-
-        function changeSys(page) {
-            var data = {
-                "chatuuid": "{{chatuuid}}",
-                "page": page
-            }
-
-            fetch(`{{url_for('change_sys')}}`, {
-                method: "POST",
-                body: JSON.stringify(data),
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            }).then(response => response.json()).then(data => {
-                if (data.status == "changed") {
-                    console.log("Successfully changed")
-                }
-            }).catch(error => console.error('Error', error));
-
-            document.getElementById('chat-container').innerHTML = '';
         }
     </script>
 </body>
