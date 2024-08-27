@@ -2,7 +2,7 @@ from flask import Flask, render_template, jsonify, request, Response, session
 from flask_socketio import SocketIO, emit
 import threading
 from main import setup_env
-from infer import Inference
+from inference_client import InferenceClient
 from uuid import uuid4
 
 app = Flask(__name__)
@@ -33,7 +33,7 @@ global global_sys_prompt
 global_sys_prompt = None
 
 setup_env()
-infer = Inference()
+infer = InferenceClient(model="gemma2-9b-it")
 socketio = SocketIO(app)
 
 ### Socket Stuff ###
@@ -104,7 +104,7 @@ def stream():
     if not prompt or not chatuuid:
         pass
 
-    return Response(infer.user_infer_stream(user_prompt=prompt, chatuuid=chatuuid, sys_prompt=global_sys_prompt), mimetype='text/event-stream')
+    return Response(infer.simple_infer(prompt, stream=True, chatuuid=chatuuid), mimetype='text/event-stream')
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -113,7 +113,7 @@ def chat():
     #sys_prompt = request.form['sys_prompt']
     chatuuid = request.form['chatuuid']
 
-    infer.user_message(user_prompt=prompt, sys_prompt="You are a helpful assistant", chatuuid=chatuuid)
+    # infer.user_message(user_prompt=prompt, sys_prompt="You are a helpful assistant", chatuuid=chatuuid)
 
     #response = infer.user_infer(user_prompt=prompt, sys_prompt="You are a helpful assistant", chatuuid=chatuuid)
 
