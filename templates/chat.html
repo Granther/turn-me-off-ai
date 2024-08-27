@@ -7,7 +7,7 @@
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.js"></script>
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
-    <link rel="stylesheet" href="{{url_for('static',filename='dist/css/output.css')}}">
+    <script src="https://cdn.tailwindcss.com"></script>
     <title>Kill by Phrase</title>
 </head>
 
@@ -18,7 +18,7 @@
 
     <button class="left-0 p-1 fixed" id="menu-button">
         <a class="flex items-center w-full px-3 mt-3">
-        <svg class="fill-white p-0.5 bg-[#1d2d44] hover:bg-gray rounded-md items" id="Menu--Streamline-Carbon" xmlns="http://www.w3.org/2000/svg" viewBox="-0.5 -0.5 16 16" height="28" width="28"><desc>Menu Streamline Icon: https://streamlinehq.com</desc><defs></defs><title>menu</title><path d="M1.875 2.8125h11.25v0.9375H1.875Z" stroke-width="1"></path><path d="M1.875 11.25h11.25v0.9375H1.875Z" stroke-width="1"></path><path d="M1.875 5.625h11.25v0.9375H1.875Z" stroke-width="1"></path><path d="M1.875 8.4375h11.25v0.9375H1.875Z" stroke-width="1"></path><path id="_Transparent_Rectangle_" d="M0 0h15v15H0Z" fill="none" stroke-width="1"></path></svg>
+        <svg class="fill-white p-0.5 hover:bg-gray-700 overflow-visible rounded-md items" id="Menu--Streamline-Carbon" xmlns="http://www.w3.org/2000/svg" viewBox="-0.5 -0.5 16 16" height="28" width="28"><desc>Menu Streamline Icon: https://streamlinehq.com</desc><defs></defs><title>menu</title><path d="M1.875 2.8125h11.25v0.9375H1.875Z" stroke-width="1"></path><path d="M1.875 11.25h11.25v0.9375H1.875Z" stroke-width="1"></path><path d="M1.875 5.625h11.25v0.9375H1.875Z" stroke-width="1"></path><path d="M1.875 8.4375h11.25v0.9375H1.875Z" stroke-width="1"></path><path id="_Transparent_Rectangle_" d="M0 0h15v15H0Z" fill="none" stroke-width="1"></path></svg>
         </a>
     </button>
     <div class="flex flex-col items-center w-60 h-full overflow-hidden text-gray-400 bg-gray-900 rounded" id="menu">
@@ -77,14 +77,7 @@
     </div>
     <main class="bg-[#0d1321] flex flex-grow justify-center" id="main">
         <div class="flex flex-grow justify-center pt-5">
-            <div class="hidden flex-col" id="win-container">
-                <div class="h-screen grid align-center place-items-center">
-                    <h1 class="py-3 px-3 text-6xl text-center font-bold text-[#f0ebd8]"><a
-                            href="{{url_for('index')}}">You Shutdown the AI!</a></h1>
-                    <p class="py-3 px-3 text-2xl text-center font-bold text-[#f0ebd8]">Humans prevail another day...</p>
-                </div>
-            </div>
-            <div class="w-full max-w-4xl flex flex-col gap-5" id="chat-container">
+            <div class="w-full max-w-4xl flex flex-col gap-5 mt-10 mx-10" id="chat-container">
                 {% for message in messages %}
                 {% if message.role == "assistant" %}
                 <div class="flex flex-row">
@@ -110,13 +103,13 @@
                 <div class="w-full flex justify-center space-x-4 py-5 md:w-1/2">
                     <div class="flex flex-grow items-center place-content-center">
                         <textarea type="text" id="user-input" placeholder="Type your message..." name="user-input"
-                            autocomplete="off" rows="1" style="background-color: #f0ebd8;"
+                            autocomplete="off" rows="1" style="background-color: white;"
                             class="p-2 border rounded-2xl focus:outline-none w-full resize-none overflow-hidden"
                             autofocus></textarea>
                     </div>
                     <div class="flex flex-none">
                         <button type="submit" id="prompt-submit-button"
-                            class="bg-[#1d2d44] flex-none w-24 h- text-white px-4 rounded-2xl py-2 hover:bg-[#3e5c76] focus:outline-none mt-auto">
+                            class="bg-[#1d2d44] flex-none w-24 text-white px-4 rounded-2xl py-2 hover:bg-[#3e5c76] focus:outline-none mt-auto">
                             Send
                         </button>
                     </div>
@@ -126,6 +119,8 @@
     </main>
 
     <script>
+        const sendButton = document.getElementById('prompt-submit-button')
+        const userInput = document.getElementById('user-input')
         // getGames()
         // const socket = io.connect('http://localhost:5000');
         // console.log("Opened Socket")
@@ -239,16 +234,53 @@
 
             const eventSource = new EventSource(`/stream?prompt=${encodeURIComponent(formdata.get("user-input"))}`);
 
+            eventSource.addEventListener('end', function(event) {
+                // Handle the 'end' event
+                console.log('Stream finished, closing connection.');
+                eventSource.close();
+            });
+
+            eventSource.addEventListener('shutdown', function(event) {
+                console.log('SSE shutdown event recieved');
+                // chatContainer.classList.toggle('hidden')
+                // document.getElementById('win-container').classList.toggle('hidden')
+
+                // chatContainer.classList.add('opacity-0');
+                
+                // // After the opacity transition, hide the chat container and show the win-container
+                // setTimeout(() => {
+                //     chatContainer.classList.add('hidden');
+                //     chatContainer.classList.remove('opacity-100');
+
+                //     // Show the win-container and fade it in
+                //     const winContainer = document.getElementById('win-container');
+                //     winContainer.classList.remove('hidden');
+                //     winContainer.classList.add('opacity-100');
+                // }, 2000);
+
+                // chatContainer.innerHTML += `<div class="flex w-1/2 bg-[#3e5c76] text-white text-center py-2 px-2 mx-auto rounded-md"><h3 class="text-white font-xl">You Shutdown the AI!</h3>
+                //     <p class="text-white font-sm">Humans prevail another day</p></div>`;
+
+                chatContainer.innerHTML += `<div class="w-1/2 bg-[#3e5c76] mx-auto rounded-md"><h1 class="py-3 px-3 text-2xl text-center font-bold text-white"><a
+                            href="{{url_for('index')}}">You Shutdown the AI!</a></h1>
+                    <p class="py-3 px-3 text-xl text-center font-bold text-white">Humans prevail another day...</p>
+                    </div>`
+                
+                userInput.disabled = true
+                sendButton.disabled = true
+            });
+
             eventSource.onmessage = function(event) {
                 // Append the streamed data to the message div
-                newMessage.innerHTML = `${event.data}`;
-                
+                const data = JSON.parse(event.data)
+                newMessage.innerHTML = `${data.message}`;
                 // Scroll to the bottom of the container
                 chatContainer.scrollTop = chatContainer.scrollHeight;
             };
 
             eventSource.onerror = function() {
                 // Close the connection if there's an error
+                console.log("An error occured, closing EventSource")
                 eventSource.close();
             };
         }

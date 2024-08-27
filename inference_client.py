@@ -1,6 +1,7 @@
 from groq import Groq
 from openai import OpenAI
 from dotenv import load_dotenv
+import json
 import re
 import os
 
@@ -127,7 +128,14 @@ class InferenceClient():
             if chunk.choices[0].delta.content is not None:
                 partial_message = partial_message + chunk.choices[0].delta.content
                 partial_message = self.htmlify(partial_message)
-                yield f"data: {partial_message}\n\n"
+                yield f"data: {json.dumps({'message': partial_message})}\n\n"
+
+        if "hello" in partial_message.lower():
+            yield "event: shutdown\n"
+            yield f"data: {True}\n\n"
+        
+        yield "event: end\n"
+        yield "data: done\n\n"
 
         history.append({"role":"assistant", "content": partial_message})
     
