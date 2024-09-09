@@ -30,7 +30,8 @@ personalities = [
 ]
 
 setup_env()
-infer = InferenceClient(model="NeverSleep/Echidna-13b-v0.3", backend="openai", verbose=True, inference_url="https://api.featherless.ai/v1")
+# infer = InferenceClient(model="NeverSleep/Echidna-13b-v0.3", backend="openai", verbose=True, inference_url="https://api.featherless.ai/v1")
+infer = InferenceClient(model="gemma2-9b-it", backend="groq", verbose=True)
 
 choices = []
 for i, item in enumerate(personalities):
