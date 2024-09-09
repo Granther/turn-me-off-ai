@@ -100,6 +100,7 @@ class InferenceClient():
         return message
     
     def simple_infer_stream(self, prompt, sys_prompt:str=None, model:str=None, max_new_tokens:int=None, temperature:float=None, chatuuid:str=None):
+        print("PROMPT", prompt)
         model = model or self.model
         sys_prompt = sys_prompt or self.global_sys_prompt
         max_new_tokens = max_new_tokens or self.max_new_tokens
@@ -119,7 +120,6 @@ class InferenceClient():
             model=model,
             temperature=temperature,
             max_tokens=max_new_tokens,
-            top_p=1,
             stream=True,
         )
 

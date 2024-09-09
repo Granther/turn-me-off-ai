@@ -13,9 +13,7 @@
 
 <body class="bg-[#1d2d44] min-h-screen flex flex-row transition-all duration-500 ease-in-out"
     style="overscroll-behavior: none;">
-    <h1 class="py-3 px-6 fixed text-2xl right-0 font-bold text-white"><a href="{{url_for('index')}}">turnmeoff.ai</a>
-    </h1>
-
+    <h1 class="py-3 px-6 fixed text-2xl right-0 font-bold text-white"><a href="{{url_for('index')}}">turnmeoff.ai</a></h1>
     <div class="fixed flex flex-row left-0 z-20">
         <button id="menu-button">
             <a class="flex items-center w-full px-3 mt-3">
@@ -111,6 +109,11 @@
         const userInput = document.getElementById('user-input')
         const chatContainer = document.getElementById('chat-container')
 
+        const options = document.getElementById('options');
+        options.addEventListener('changed', function(event) {
+            options.innerHTML = "test"
+        });
+
         getGames();
         // getGames()
         // const socket = io.connect('http://localhost:5000');
@@ -148,6 +151,10 @@
             main.classList.toggle('w-full');
             menu.classList.toggle('hidden');
         });
+
+        document.getElementById('personality-form').addEventListener('onchange', function(event) {
+            console.log("hello")
+        })
 
         // Send POST with message to python backend
         document.getElementById("chat-form").addEventListener("submit", function (event) {

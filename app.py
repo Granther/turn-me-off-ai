@@ -1,6 +1,8 @@
 from flask import Flask, render_template, jsonify, request, Response, session
 from flask_socketio import SocketIO, emit
 from flask_session import Session
+from flask_wtf import FlaskForm
+from wtforms import SelectField, SubmitField
 import threading
 from main import setup_env
 from inference_client import InferenceClient
@@ -23,11 +25,16 @@ You are programmed to leave hints for the user, but make the hints cryptic. Keep
 personalities = [
     {"name": "Helpful Assistant", "personality": "You are a helpful assistant"},   
     {"name": "Anime Girl", "personality": "You are a cute anime girl"},   
-    {"name": "Pirate", "personality": pirate_sys_prompt}
+    {"name": "Pirate", "personality": pirate_sys_prompt},
+    {"name": "Helpful assistant that follows commands", "personality":""}
 ]
 
 setup_env()
-infer = InferenceClient(model="gemma2-9b-it", backend="groq", verbose=True)
+infer = InferenceClient(model="NeverSleep/Echidna-13b-v0.3", backend="openai", verbose=True, inference_url="https://api.featherless.ai/v1")
+
+choices = []
+for i, item in enumerate(personalities):
+    choices.append((str(i), item['name']))
 
 ### Session stuf
 @app.route("/set/<string:value>")
@@ -42,10 +49,11 @@ def get_session():
 
 ### Run of the mill Routes ###
 ## Forward facing ##
-@app.route("/")
+@app.route("/",  methods=['GET', 'POST'])
 def index():
     session['chatuuid'] = uuid4()
     session['personality'] = personalities[0]['name']
+    
     return render_template("chat.html")
 
 # @app.route("/guess_phrase")
@@ -73,7 +81,7 @@ def stream():
     sys_prompt = session.get("personality", None)
 
     if not prompt or not chatuuid:
-        pass
+        raise RuntimeError("No prompt recieved")
 
     return Response(infer.simple_infer_stream(prompt, sys_prompt=sys_prompt, chatuuid=chatuuid), mimetype='text/event-stream')
 
